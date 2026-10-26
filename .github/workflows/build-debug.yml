@@ -1,0 +1,31 @@
+name: Build patched APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Build debug APK
+        run: |
+          echo releaseType=CI > package.properties
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gramophone-songs-only
+          path: app/build/outputs/apk/debug/*.apk
+          
